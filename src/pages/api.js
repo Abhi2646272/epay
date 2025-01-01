@@ -9,6 +9,22 @@ const api = axios.create({
   },
 });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+ 
+
+
+
+
+
+
+
 // API call to register a user
 export const registerUser = async (userData) => {
   try {
@@ -67,7 +83,11 @@ export const getWalletBalance = async (walletId) => {
 // API call to send money
 export const sendMoney = async (transactionData) => {
   try {
-    const response = await api.post('/wallet/transfer', transactionData);
+
+    const txnReq = {walletId:transactionData.upi, amount:transactionData.amount};
+
+    
+    const response = await api.post('/wallet/add-money', transactionData);
     return response.data; // Return transaction success
   } catch (error) {
     console.error('Error sending money:', error);

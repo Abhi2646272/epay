@@ -12,6 +12,7 @@ const Sidebar = () => {
                 textAlign:'center',
                 fontStyle:'italic',
                 fontSize:'35px',
+                marginRight:'10px',
                 fontWeight: 'bold',
                 background: 'linear-gradient(to left, #FF0000 0%, #000000 100%)',
                 WebkitBackgroundClip: 'text',
@@ -22,13 +23,13 @@ const Sidebar = () => {
             ePay
         </h2>
      <ul className="sidebar-list">
-        <li><Link to="/login">Login</Link></li>
-        <li><Link to="/register">Register</Link></li>
-        <li><Link to="/send-money">Send Money</Link></li>
-        <li><Link to="/check-balance">Check Balance</Link></li>
-        <li><Link to="/transactions">View Transactions</Link></li>
-        <li><Link to="/manage-beneficiaries">Manage Beneficiaries</Link></li>
-        <li><Link to="/profile-settings">Profile Settings</Link></li>
+        {/* <li><Link to="/login">Login</Link></li>
+        <li><Link to="/register">Register</Link></li> */}
+        <li><Link to="/user/send-money">Send Money</Link></li>
+        <li><Link to="/user/check-balance">Check Balance</Link></li>
+        <li><Link to="/user/transactions">View Transactions</Link></li>
+        <li><Link to="/user/manage-beneficiaries">Manage Beneficiaries</Link></li>
+        <li><Link to="/user/profile-settings">Profile Settings</Link></li>
       </ul>
     </div>
   );

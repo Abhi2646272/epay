@@ -1,109 +1,230 @@
 import React, { useState } from 'react';
+import { sendMoney } from './api'; // Import sendMoney API function
 
 const SendMoney = () => {
-  const [receiver, setReceiver] = useState('');
-  const [amount, setAmount] = useState('');
+  const [activeTab, setActiveTab] = useState('upi'); // Tabs: 'upi', 'bank', 'mobile'
+  const [formData, setFormData] = useState({
+    upi: '',
+    mobile: '',
+    bankAccount: '',
+    ifsc: '',
+    amount: '',
+  });
+  const [loading, setLoading] = useState(false); // Loading state for API request
+  const [error, setError] = useState(null); // Error state for handling errors
+  const [success, setSuccess] = useState(null); 
 
-  const handleSubmit = (e) => {
+  const handleChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const sendData = { receiver, amount };
-    console.log(sendData); // Replace with API call
+    try {
+      const transactionData = {
+        walletId: formData.upi, // Replace with actual wallet ID
+        amount: parseFloat(formData.amount), // Ensure amount is a number
+      };
+      // const transactionData = {
+      //   ...formData,
+      //   amount: parseFloat(formData.amount), // Ensure amount is a number
+      // };
+
+      const response = await sendMoney(transactionData); // Call sendMoney API function
+      setSuccess('Transaction successful!');  // Display success message
+    } catch (error) {
+      setError('Error sending money, please try again later.');  // Display error message
+    } finally {
+      setLoading(false);
+    }
+    console.log(`Sending money via ${activeTab}`, formData); // Replace with actual API call
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.formContainer}>
-        <h2 style={styles.header}>Send Money</h2>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <label style={styles.label}>
-            Receiver (Email/Phone Number/UPI ID):
-            <input
-              type="text"
-              value={receiver}
-              onChange={(e) => setReceiver(e.target.value)}
-              required
-              style={styles.input}
-            />
-          </label>
-          <label style={styles.label}>
-            Amount:
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-              style={styles.input}
-            />
-          </label>
-          <button type="submit" style={styles.button}>Send</button>
-        </form>
+      <div style={styles.content}>
+        <div style={styles.card}>
+          <h2 style={styles.header}>Send Money</h2>
+
+          {/* Tabs */}
+          <div style={styles.tabContainer}>
+            {['upi', 'bank', 'mobile'].map((tab) => (
+              <button
+                key={tab}
+                style={
+                  activeTab === tab
+                    ? { ...styles.tab, ...styles.activeTab }
+                    : styles.tab
+                }
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab === 'upi' && 'Send to UPI'}
+                {tab === 'bank' && 'Send to Bank'}
+                {tab === 'mobile' && 'Send to Mobile'}
+              </button>
+            ))}
+          </div>
+
+          {/* Form */}
+          <form style={styles.form} onSubmit={handleSubmit}>
+            {activeTab === 'upi' && (
+              <label style={styles.label}>
+                UPI ID:
+                <input
+                  type="text"
+                  value={formData.upi}
+                  onChange={(e) => handleChange('upi', e.target.value)}
+                  style={styles.input}
+                  required
+                />
+              </label>
+            )}
+
+            {activeTab === 'bank' && (
+              <>
+                <label style={styles.label}>
+                  Bank Account Number:
+                  <input
+                    type="text"
+                    value={formData.bankAccount}
+                    onChange={(e) => handleChange('bankAccount', e.target.value)}
+                    style={styles.input}
+                    required
+                  />
+                </label>
+                <label style={styles.label}>
+                  IFSC Code:
+                  <input
+                    type="text"
+                    value={formData.ifsc}
+                    onChange={(e) => handleChange('ifsc', e.target.value)}
+                    style={styles.input}
+                    required
+                  />
+                </label>
+              </>
+            )}
+
+            {activeTab === 'mobile' && (
+              <label style={styles.label}>
+                Mobile Number:
+                <input
+                  type="tel"
+                  value={formData.mobile}
+                  onChange={(e) => handleChange('mobile', e.target.value)}
+                  style={styles.input}
+                  required
+                />
+              </label>
+            )}
+
+            <label style={styles.label}>
+              Amount:
+              <input
+                type="number"
+                value={formData.amount}
+                onChange={(e) => handleChange('amount', e.target.value)}
+                style={styles.input}
+                required
+              />
+            </label>
+
+            <button type="submit" style={styles.button}>
+              Send Money
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
 };
 
-// Styles
 const styles = {
   container: {
-    margin: 0,
-    padding: 0,
-    height: '100vh',
-    display: 'flex',
+    margin: "20px",
+    marginLeft: "50px",
+    padding: "20px",
+    maxWidth: "800px",
+    borderRadius: "15px",
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f4f4f4',
     overflow: 'hidden',
   },
-  formContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    padding: '30px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  content: {
     width: '100%',
-    maxWidth: '450px',
+    maxWidth: '600px',
+    padding: '20px',
     boxSizing: 'border-box',
+  },
+  card: {
+    width: '100%',
+    padding: '20px',
+    backgroundColor: '#e0e0e0',
+    borderRadius: '20px',
+    boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff',
   },
   header: {
     textAlign: 'center',
-    marginBottom: '20px',
     fontSize: '24px',
+    marginBottom: '20px',
+    color: '#333',
+  },
+  tabContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: '20px',
+  },
+  tab: {
+    flex: 1,
+    padding: '10px',
+    margin: '0 5px',
+    borderRadius: '10px',
+    border: 'none',
+    backgroundColor: '#e0e0e0',
+    boxShadow: '5px 5px 10px #bebebe, -5px -5px 10px #ffffff',
+    textAlign: 'center',
+    cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    color: '#555',
+    transition: 'all 0.3s ease',
+  },
+  activeTab: {
+    backgroundColor: '#d1d1d1',
+    boxShadow: 'inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff',
     color: '#333',
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
-    width: '100%',
   },
   label: {
     marginBottom: '15px',
-    fontSize: '16px',
+    fontSize: '14px',
     color: '#555',
-    textAlign: 'left',
-    width: '100%',
   },
   input: {
-    padding: '12px',
-    marginBottom: '15px',
-    fontSize: '16px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
     width: '100%',
-    boxSizing: 'border-box',
+    padding: '10px',
+    borderRadius: '10px',
+    border: 'none',
+    backgroundColor: '#e0e0e0',
+    boxShadow: 'inset 3px 3px 6px #bebebe, inset -3px -3px 6px #ffffff',
+    marginTop: '5px',
+    fontSize: '14px',
+    outline: 'none',
+    color: '#333',
   },
   button: {
     padding: '12px',
     backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
+    color: '#fff',
     fontSize: '16px',
-    transition: 'background-color 0.3s',
-    width: '100%',
+    border: 'none',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    boxShadow: '3px 3px 6px #bebebe, -3px -3px 6px #ffffff',
+    transition: 'background-color 0.3s ease',
   },
 };
 

@@ -7,11 +7,13 @@ import Transactions from './pages/Transactions';
 import ManageBeneficiaries from './pages/ManageBeneficiaries';
 import ProfileSettings from './pages/ProfileSettings';
 
-const UserRoutes = ({ isAuthenticated }) => {
+const UserRoutes = () => {
+  // const { isAuthenticated } = React.useContext(AuthContext);
+  const isAuthenticated = true;
   return (
     <>
       {isAuthenticated && <Sidebar />}
-      <div style={{ marginLeft: isAuthenticated ? '260px' : '0', padding: '20px', width: '100%', backgroundColor: '#fff', boxShadow: '3px 3px 10px 3px #dddddd;' }}>
+      <div style={{ marginLeft: isAuthenticated ? '260px' : '0', padding: '20px', width: '100%'  }}>
         <Routes>
           <Route path="/send-money" element={isAuthenticated ? <SendMoney /> : <Navigate to="/login" />} />
           <Route path="/check-balance" element={isAuthenticated ? <CheckBalance /> : <Navigate to="/login" />} />

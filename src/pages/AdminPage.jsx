@@ -38,51 +38,61 @@ const AdminPage = () => {
 
   return (
     <div style={styles.container}>
-      <h1>Admin Dashboard</h1>
+      <h2 style={styles.title}>Admin Dashboard</h2>
+
+      {/* Users Section */}
       <div style={styles.section}>
-        <h2>Users</h2>
+        <h3 style={styles.sectionTitle}>Users</h3>
         <table style={styles.table}>
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Wallet ID</th>
-              <th>Balance</th>
+              <th style={styles.th}>Name</th>
+              <th style={styles.th}>Email</th>
+              <th style={styles.th}>Wallet ID</th>
+              <th style={styles.th}>Balance</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
               <tr key={user.walletId}>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.walletId}</td>
-                <td>{user.balance}</td>
+                <td style={styles.td}>{user.name}</td>
+                <td style={styles.td}>{user.email}</td>
+                <td style={styles.td}>{user.walletId}</td>
+                <td style={styles.td}>{user.balance}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
+      {/* Transactions Section */}
       <div style={styles.section}>
-        <h2>Transactions</h2>
+        <h3 style={styles.sectionTitle}>Transactions</h3>
         <table style={styles.table}>
           <thead>
             <tr>
-              <th>Transaction ID</th>
-              <th>Sender</th>
-              <th>Receiver</th>
-              <th>Amount</th>
-              <th>Date</th>
+              <th style={styles.th}>Transaction ID</th>
+              <th style={styles.th}>Sender</th>
+              <th style={styles.th}>Receiver</th>
+              <th style={styles.th}>Amount</th>
+              <th style={styles.th}>Date</th>
             </tr>
           </thead>
           <tbody>
             {transactions.map((tx) => (
               <tr key={tx.id}>
-                <td>{tx.id}</td>
-                <td>{tx.sender}</td>
-                <td>{tx.receiver}</td>
-                <td>{tx.amount}</td>
-                <td>{tx.timestamp}</td>
+                <td style={styles.td}>{tx.id}</td>
+                <td style={styles.td}>{tx.sender}</td>
+                <td style={styles.td}>{tx.receiver}</td>
+                <td
+                  style={{
+                    ...styles.td
+                     
+                  }}
+                >
+                  {tx.amount}
+                </td>
+                <td style={styles.td}>{tx.timestamp}</td>
               </tr>
             ))}
           </tbody>
@@ -96,21 +106,50 @@ const AdminPage = () => {
 const styles = {
   container: {
     padding: '20px',
-    backgroundColor: '#f4f4f4',
+    backgroundColor: '#e0e5ec',
+    maxWidth: '900px',
+    margin: '20px auto',
+    borderRadius: '15px',
+    boxShadow: '6px 6px 10px #b8b9be, -6px -6px 10px #ffffff',
+  },
+  title: {
+    marginBottom: '20px',
+    fontSize: '1.8em',
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
   },
   section: {
     marginBottom: '30px',
   },
+  sectionTitle: {
+    fontSize: '1.5em',
+    marginBottom: '10px',
+    fontWeight: 'bold',
+    color: '#333',
+  },
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    marginTop: '10px',
+    textAlign: 'left',
   },
-  tableHead: {
-    backgroundColor: '#f2f2f2',
+  th: {
+    padding: '15px 20px',
+    border: '1px solid #d9dee3',
+    backgroundColor: '#f0f2f5',
+    color: '#333',
+    fontWeight: 'bold',
+    fontSize: '1.1em',
   },
-  tableRow: {
-    borderBottom: '1px solid #ddd',
+  td: {
+    padding: '15px 20px',
+    border: '1px solid #d9dee3',
+  },
+  negative: {
+    color: 'red',
+  },
+  positive: {
+    color: 'green',
   },
 };
 

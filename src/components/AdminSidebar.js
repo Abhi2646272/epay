@@ -8,6 +8,7 @@ const AdminSidebar = () => {
       <ul className="sidebar-list">
         <li><Link to="/admin">Dashboard</Link></li>
         <li><Link to="/manage-users">Manage Users</Link></li>
+        <li><Link to="/all-transaction">All Transactions</Link></li>
         <li><Link to="/settings">Settings</Link></li>
         {/* Add more admin-specific links here */}
       </ul>
