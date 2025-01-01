@@ -1,139 +1,140 @@
 import React, { useState } from 'react';
-import { sendMoney } from './api'; // Import sendMoney API function
+import { addMoneyToWallet, sendToBank, sendToWallet } from './api'; // Import API functions
+import { useSelector } from 'react-redux';
 
-const SendMoney = () => {
-  const [activeTab, setActiveTab] = useState('upi'); // Tabs: 'upi', 'bank', 'mobile'
+const WalletActions = () => {
+  const [activeTab, setActiveTab] = useState('addMoney');
   const [formData, setFormData] = useState({
-    upi: '',
-    mobile: '',
-    bankAccount: '',
-    ifsc: '',
     amount: '',
+    description: '',
+    accountNumber: '', // For Send to Bank
+    walletId: '', // For Send to Wallet
   });
-  const [loading, setLoading] = useState(false); // Loading state for API request
-  const [error, setError] = useState(null); // Error state for handling errors
-  const [success, setSuccess] = useState(null); 
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const walletId = useSelector((state) => state.auth.walletId); // Access walletId from Redux store
 
-  const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage('');
     try {
-      const transactionData = {
-        walletId: formData.upi, // Replace with actual wallet ID
-        amount: parseFloat(formData.amount), // Ensure amount is a number
-      };
-      // const transactionData = {
-      //   ...formData,
-      //   amount: parseFloat(formData.amount), // Ensure amount is a number
-      // };
-
-      const response = await sendMoney(transactionData); // Call sendMoney API function
-      setSuccess('Transaction successful!');  // Display success message
+      let response;
+      switch (activeTab) {
+        case 'addMoney':
+          response = await addMoneyToWallet({
+            walletId: walletId, // Hardcoded wallet ID for now
+            amount: formData.amount,
+            description: formData.description,
+          });
+          break;
+        case 'sendToBank':
+          response = await sendToBank({
+            amount: formData.amount,
+            description: formData.description,
+            accountNumber: formData.accountNumber,
+          });
+          break;
+        case 'sendToWallet':
+          response = await sendToWallet({
+            amount: formData.amount,
+            description: formData.description,
+            walletId: formData.walletId,
+          });
+          break;
+        default:
+          throw new Error('Invalid action');
+      }
+      setMessage('Action successful!');
     } catch (error) {
-      setError('Error sending money, please try again later.');  // Display error message
+      setMessage('Action failed. Please try again.');
     } finally {
       setLoading(false);
     }
-    console.log(`Sending money via ${activeTab}`, formData); // Replace with actual API call
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.content}>
-        <div style={styles.card}>
-          <h2 style={styles.header}>Send Money</h2>
-
-          {/* Tabs */}
-          <div style={styles.tabContainer}>
-            {['upi', 'bank', 'mobile'].map((tab) => (
-              <button
-                key={tab}
-                style={
-                  activeTab === tab
-                    ? { ...styles.tab, ...styles.activeTab }
-                    : styles.tab
-                }
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab === 'upi' && 'Send to UPI'}
-                {tab === 'bank' && 'Send to Bank'}
-                {tab === 'mobile' && 'Send to Mobile'}
-              </button>
-            ))}
-          </div>
-
-          {/* Form */}
-          <form style={styles.form} onSubmit={handleSubmit}>
-            {activeTab === 'upi' && (
-              <label style={styles.label}>
-                UPI ID:
-                <input
-                  type="text"
-                  value={formData.upi}
-                  onChange={(e) => handleChange('upi', e.target.value)}
-                  style={styles.input}
-                  required
-                />
-              </label>
-            )}
-
-            {activeTab === 'bank' && (
-              <>
-                <label style={styles.label}>
-                  Bank Account Number:
-                  <input
-                    type="text"
-                    value={formData.bankAccount}
-                    onChange={(e) => handleChange('bankAccount', e.target.value)}
-                    style={styles.input}
-                    required
-                  />
-                </label>
-                <label style={styles.label}>
-                  IFSC Code:
-                  <input
-                    type="text"
-                    value={formData.ifsc}
-                    onChange={(e) => handleChange('ifsc', e.target.value)}
-                    style={styles.input}
-                    required
-                  />
-                </label>
-              </>
-            )}
-
-            {activeTab === 'mobile' && (
-              <label style={styles.label}>
-                Mobile Number:
-                <input
-                  type="tel"
-                  value={formData.mobile}
-                  onChange={(e) => handleChange('mobile', e.target.value)}
-                  style={styles.input}
-                  required
-                />
-              </label>
-            )}
-
-            <label style={styles.label}>
-              Amount:
-              <input
-                type="number"
-                value={formData.amount}
-                onChange={(e) => handleChange('amount', e.target.value)}
-                style={styles.input}
-                required
-              />
-            </label>
-
-            <button type="submit" style={styles.button}>
-              Send Money
-            </button>
-          </form>
+      <div style={styles.card}>
+        {/* Tabs */}
+        <div style={styles.tabContainer}>
+          <button
+            style={activeTab === 'addMoney' ? { ...styles.tab, ...styles.activeTab } : styles.tab}
+            onClick={() => setActiveTab('addMoney')}
+          >
+            Add Money to Wallet
+          </button>
+          <button
+            style={activeTab === 'sendToBank' ? { ...styles.tab, ...styles.activeTab } : styles.tab}
+            onClick={() => setActiveTab('sendToBank')}
+          >
+            Send to Bank
+          </button>
+          <button
+            style={activeTab === 'sendToWallet' ? { ...styles.tab, ...styles.activeTab } : styles.tab}
+            onClick={() => setActiveTab('sendToWallet')}
+          >
+            Send to Wallet
+          </button>
         </div>
+
+        {/* Form */}
+        <form style={styles.form} onSubmit={handleSubmit}>
+          <input
+            type="number"
+            name="amount"
+            style={styles.input}
+            placeholder="Enter Amount"
+            value={formData.amount}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="description"
+            style={styles.textarea}
+            placeholder="Enter Remark/Description"
+            value={formData.description}
+            onChange={handleChange}
+            required
+          />
+
+          {activeTab === 'sendToBank' && (
+            <input
+              type="text"
+              name="accountNumber"
+              style={styles.input}
+              placeholder="Enter Account Number"
+              value={formData.accountNumber}
+              onChange={handleChange}
+              required
+            />
+          )}
+
+          {activeTab === 'sendToWallet' && (
+            <input
+              type="text"
+              name="walletId"
+              style={styles.input}
+              placeholder="Enter Wallet ID"
+              value={formData.walletId}
+              onChange={handleChange}
+              required
+            />
+          )}
+
+          <button type="submit" style={styles.button} disabled={loading}>
+            {loading ? 'Processing...' : 'Submit'}
+          </button>
+        </form>
+
+        {/* Message */}
+        {message && <div style={styles.message}>{message}</div>}
       </div>
     </div>
   );
@@ -144,30 +145,16 @@ const styles = {
     margin: "20px",
     marginLeft: "50px",
     padding: "20px",
-    maxWidth: "800px",
-    borderRadius: "15px",
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
-  },
-  content: {
-    width: '100%',
-    maxWidth: '600px',
-    padding: '20px',
-    boxSizing: 'border-box',
+    fontFamily: 'Arial, sans-serif',
   },
   card: {
-    width: '100%',
-    padding: '20px',
+    width: '500px',
     backgroundColor: '#e0e0e0',
     borderRadius: '20px',
     boxShadow: '15px 15px 30px #bebebe, -15px -15px 30px #ffffff',
-  },
-  header: {
-    textAlign: 'center',
-    fontSize: '24px',
-    marginBottom: '20px',
-    color: '#333',
+    padding: '14px',
   },
   tabContainer: {
     display: 'flex',
@@ -178,54 +165,63 @@ const styles = {
     flex: 1,
     padding: '10px',
     margin: '0 5px',
-    borderRadius: '10px',
-    border: 'none',
-    backgroundColor: '#e0e0e0',
-    boxShadow: '5px 5px 10px #bebebe, -5px -5px 10px #ffffff',
     textAlign: 'center',
-    cursor: 'pointer',
     fontSize: '14px',
-    fontWeight: 'bold',
-    color: '#555',
-    transition: 'all 0.3s ease',
+    fontWeight: '600',
+    border: 'none',
+    cursor: 'pointer',
+    backgroundColor: '#e0e0e0',
+    color: '#666',
+    boxShadow: '5px 5px 10px #bebebe, -5px -5px 10px #ffffff',
+    borderRadius: '10px',
   },
   activeTab: {
-    backgroundColor: '#d1d1d1',
-    boxShadow: 'inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff',
     color: '#333',
+    boxShadow: 'inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff',
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
   },
-  label: {
-    marginBottom: '15px',
-    fontSize: '14px',
-    color: '#555',
-  },
   input: {
-    width: '100%',
-    padding: '10px',
+    padding: '12px',
+    fontSize: '14px',
+    marginBottom: '15px',
     borderRadius: '10px',
     border: 'none',
     backgroundColor: '#e0e0e0',
     boxShadow: 'inset 3px 3px 6px #bebebe, inset -3px -3px 6px #ffffff',
-    marginTop: '5px',
-    fontSize: '14px',
     outline: 'none',
     color: '#333',
   },
+  textarea: {
+    padding: '12px',
+    fontSize: '14px',
+    marginBottom: '15px',
+    borderRadius: '10px',
+    border: 'none',
+    backgroundColor: '#e0e0e0',
+    boxShadow: 'inset 3px 3px 6px #bebebe, inset -3px -3px 6px #ffffff',
+    outline: 'none',
+    color: '#333',
+    resize: 'none',
+  },
   button: {
     padding: '12px',
-    backgroundColor: '#007bff',
-    color: '#fff',
     fontSize: '16px',
+    fontWeight: 'bold',
+    color: '#fff',
+    backgroundColor: '#007bff',
     border: 'none',
     borderRadius: '10px',
     cursor: 'pointer',
     boxShadow: '3px 3px 6px #bebebe, -3px -3px 6px #ffffff',
-    transition: 'background-color 0.3s ease',
+  },
+  message: {
+    marginTop: '10px',
+    textAlign: 'center',
+    color: '#333',
   },
 };
 
-export default SendMoney;
+export default WalletActions;

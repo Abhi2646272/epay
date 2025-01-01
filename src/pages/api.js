@@ -18,13 +18,6 @@ api.interceptors.request.use((config) => {
 });
 
  
-
-
-
-
-
-
-
 // API call to register a user
 export const registerUser = async (userData) => {
   try {
@@ -83,10 +76,7 @@ export const getWalletBalance = async (walletId) => {
 // API call to send money
 export const sendMoney = async (transactionData) => {
   try {
-
     const txnReq = {walletId:transactionData.upi, amount:transactionData.amount};
-
-    
     const response = await api.post('/wallet/add-money', transactionData);
     return response.data; // Return transaction success
   } catch (error) {
@@ -102,6 +92,54 @@ export const getTransactionHistory = async (walletId) => {
     return response.data; // Return transaction history
   } catch (error) {
     console.error('Error fetching transactions:', error);
+    throw error;
+  }
+};
+
+export const addMoneyToWallet = async (transactionData) => {
+  try {
+    const requestPayload = {
+      walletId: transactionData.walletId,
+      amount: transactionData.amount,
+      description: transactionData.description,
+    };
+    const response = await api.post('/wallet/add-money', requestPayload);
+    return response.data; // Success response
+  } catch (error) {
+    console.error('Error adding money to wallet:', error);
+    throw error;
+  }
+};
+
+// Send Money to Bank
+export const sendToBank = async (transactionData) => {
+  try {
+    const requestPayload = {
+      accountNumber: transactionData.accountNumber,
+      amount: transactionData.amount,
+      description: transactionData.description,
+    };
+    const response = await api.post('/wallet/send-to-bank', requestPayload);
+    return response.data; // Success response
+  } catch (error) {
+    console.error('Error sending money to bank:', error);
+    throw error;
+  }
+};
+
+// Send Money to Another Wallet
+export const sendToWallet = async (transactionData) => {
+  try {
+    const requestPayload = {
+      senderWalletId: transactionData.senderWalletId,
+      receiverWalletId: transactionData.receiverWalletId,
+      amount: transactionData.amount,
+      description: transactionData.description,
+    };
+    const response = await api.post('/wallet/transfer', requestPayload);
+    return response.data; // Success response
+  } catch (error) {
+    console.error('Error sending money to another wallet:', error);
     throw error;
   }
 };

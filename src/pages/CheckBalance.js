@@ -1,9 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getWalletBalance } from './api';
+import { useSelector, useDispatch } from 'react-redux';
 
 const CheckBalance = () => {
-  const [walletId, setWalletId] = useState('');
-  const [balance, setBalance] = useState(null);
+  // const [walletId, setWalletId] = useState('');
+  const walletId1 = useSelector((state) => state.auth.walletId); // Get walletId from Redux
+  const balance1 = useSelector((state) => state.auth.balance); // Get balance from Redux
+  const dispatch = useDispatch();
+  const [balance, setBalance] = useState(balance1);
+    const [walletId, setWalletId] = useState(walletId1);
+
+   useEffect(() => {
+    const handleCheckBalance = async () => {
+      try {
+         const response = await getWalletBalance(walletId);
+        console.log('Response:', response);
+        dispatch(setBalance(response));
+        // setBalance(response);
+      } catch (error) {
+        // Handle error
+      }
+    };   
+    handleCheckBalance();   // Fetch all transactions when the component mounts
+      
+    }, []);
 
   const handleCheckBalance = async () => {
     try {
@@ -15,11 +35,11 @@ const CheckBalance = () => {
       // Handle error
     }
   };
-
+ 
   return (
     <div style={styles.container}>
       <h2 style={styles.header}>Check Balance</h2>
-      <input
+       <input
         style={styles.input}
         type="text"
         placeholder="Enter Wallet ID"

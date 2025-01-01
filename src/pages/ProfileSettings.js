@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-
+import imps from "../images/imps.png";
+ import upi from "../images/upi.png";
+import aeps from "../images/aeps.png";
 const ProfileSettings = () => {
   // Hardcoded user data
   const [userData, setUserData] = useState({
@@ -14,7 +16,7 @@ const ProfileSettings = () => {
   const bankAccounts = [
     {
       name: "Bank of America",
-      logoUrl: "https://via.placeholder.com/50",
+      logoUrl:aeps,
       accountNumber: "123456789",
       balance: "$5,000",
       debitCard: "4111 1111 1111 1111",
@@ -22,7 +24,7 @@ const ProfileSettings = () => {
     },
     {
       name: "Chase Bank",
-      logoUrl: "https://via.placeholder.com/50",
+      logoUrl: imps,
       accountNumber: "987654321",
       balance: "$10,000",
       debitCard: "4111 2222 3333 4444",
@@ -30,7 +32,7 @@ const ProfileSettings = () => {
     },
     {
       name: "Wells Fargo",
-      logoUrl: "https://via.placeholder.com/50",
+      logoUrl:upi,
       accountNumber: "456789123",
       balance: "$2,000",
       debitCard: "4111 5555 6666 7777",
@@ -113,9 +115,10 @@ const ProfileSettings = () => {
       boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
     },
     bankLogo: {
-      width: "50px",
-      height: "50px",
+      width: "auto",
+      height: "40px",
       marginRight: "10px",
+      padding: "5px",
     },
     bankName: {
       fontWeight: "bold",

@@ -1,36 +1,35 @@
-import React, { createContext, useState, useEffect } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux'; // or useContext if using context
+import { login } from './slice/authSlice'; // redux action or your context method
+import { createContext } from 'react'; // Make sure createContext is imported
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [role, setRole] = useState(null);
+  const dispatch = useDispatch();
+  const [userData, setUserData] = useState(null);
+  const [walletId, setWalletId] = useState(null); // Local state to hold walletId
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    const userRole = localStorage.getItem('role');
-    if (accessToken && userRole) {
-      setIsAuthenticated(true);
-      setRole(userRole);
-    }
-  }, []);
-
-  const login = (token, role) => {
+  const handleLogin = async (token, user) => {
     localStorage.setItem('accessToken', token);
-    localStorage.setItem('role', role);
-    setIsAuthenticated(true);
-    setRole(role);
-  }; 
+    localStorage.setItem('userData', JSON.stringify(user));
+    
+    // Assuming the response from login contains walletId
+    setUserData(user);
+    setWalletId(user.walletId); // Store walletId after login
 
-  const logout = () => {
+    // Dispatch login to global state (if using Redux)
+    dispatch(login({ userData: user, walletId: user.walletId, balance: user.balance })); // Store in global state (Redux or Context)
+  };
+
+  const handleLogout = () => {
     localStorage.removeItem('accessToken');
-    localStorage.removeItem('role');
-    setIsAuthenticated(false);
-    setRole(null);
+    localStorage.removeItem('userData');
+    setUserData(null); // Clear user data
+    setWalletId(null); // Clear walletId
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, role, login, logout }}>
+    <AuthContext.Provider value={{ userData, walletId, login: handleLogin, logout: handleLogout }}>
       {children}
     </AuthContext.Provider>
   );

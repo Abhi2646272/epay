@@ -4,9 +4,10 @@ import { registerUser, loginUser } from './api'; // Import API functions
 import { AuthContext } from '../AuthProvider';
 
 const LoginRegisterNeuromorphic = () => {
-  const [activeTab, setActiveTab] = useState('login');
   const { login } = useContext(AuthContext);
-
+ 
+  const [activeTab, setActiveTab] = useState('login');
+ 
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -35,18 +36,18 @@ const LoginRegisterNeuromorphic = () => {
       };
       const response = await loginUser(loginData);
       localStorage.setItem('accessToken', response.accessToken);
-      // localStorage.setItem('refreshToken', response.refreshToken);
       localStorage.setItem('role', response.role);
-      login(response.accessToken, response.role);
-
-      // navigate(response.role === 'ADMIN' ? '/admin' : '/user/send-money');
-      // if(response.role === 'ADMIN') {
-      //   navigate('/admin');
-      // }
       console.log('role:', response.role);
       console.log('accessToken:', response.accessToken);
-       // // alert('Login successful!');
-      navigate('/user/send-money');
+      console.log('res:', response);
+      login(response.accessToken, response.user);
+ 
+      console.log('role:', response.role);
+      console.log('accessToken:', response.accessToken);
+      if(response.role === 'ADMIN'){
+      navigate('/admin/dashboard');
+      }else{
+      navigate('/user/send-money');}
     } catch (err) {
       setError('Login failed. Please check your credentials.');
     } finally {
