@@ -7,6 +7,7 @@ const WalletActions = () => {
   const [formData, setFormData] = useState({
     amount: '',
     description: '',
+    recieverWalletId: '', // For Add Money
     accountNumber: '', // For Send to Bank
     walletId: '', // For Send to Wallet
   });
@@ -44,7 +45,8 @@ const WalletActions = () => {
           response = await sendToWallet({
             amount: formData.amount,
             description: formData.description,
-            walletId: formData.walletId,
+            senderWalletId: walletId,
+            receiverWalletId: formData.walletId
           });
           break;
         default:

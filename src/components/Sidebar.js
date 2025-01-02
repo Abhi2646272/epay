@@ -36,9 +36,13 @@ const Sidebar = () => {
         {/* <li><Link to="/login">Login</Link></li>
         <li><Link to="/register">Register</Link></li> */}
         <li><Link to="/user/send-money">Send Money</Link></li>
+        <li><Link to="/user/send-money">UPI Transfer</Link></li>
+
         <li><Link to="/user/check-balance">Check Balance</Link></li>
         <li><Link to="/user/transactions">View Transactions</Link></li>
-        <li><Link to="/user/manage-beneficiaries">Manage Beneficiaries</Link></li>
+        <li><Link to="/user/manage-beneficiaries">Bill Payment</Link></li>
+        <li><Link to="/user/profile-settings">Bank Accounts</Link></li>
+
         <li><Link to="/user/profile-settings">Profile Settings</Link></li>
         <li><button onClick={handleLogout} style={{
               padding: '10px 20px',
